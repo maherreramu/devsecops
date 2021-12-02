@@ -1,11 +1,17 @@
-node {
-  stage('SCM') {
-    checkout scm
-  }
-  stage('SonarQube Analysis') {
-    def scannerHome = tool 'SonarScanner';
-    withSonarQubeEnv() {
-      sh "${scannerHome}/bin/sonar-scanner"
+pipeline{
+    agent any
+    
+    stage('cloning git'){
+        git 'https://github.com/maherreramu/devsecops.git'
     }
-  }
+    stage('sonar analysis'){
+        def scannerHome = tool 'sonar'
+        WithSonarQubeEnv('sonar'){
+            sh "$(scannerHome)/bin/sonar-scanner \
+            -Dsonar.projectKey=sonar \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.login=5ec91965645172864ac86aafaf8ab8ac3a4cabc0"
+        }
+    }
 }
